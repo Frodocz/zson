@@ -62,6 +62,7 @@ Scanner::JsonTokenType Scanner::scan() {
         return JsonTokenType::END_OF_SOURCE;
     }
 
+    m_prevIdx = m_curIdx;
     char c = advance();
     switch (c) {
         case '{':

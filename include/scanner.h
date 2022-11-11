@@ -30,7 +30,11 @@ public:
         VALUE_ERROR,        // Unsupport Token
     };
 
+    Scanner(const char* source): m_source{source}, m_curIdx{0}, m_prevIdx{0} {}
     JsonTokenType scan();
+    const std::string& getValueString() const { return m_val_string; }
+    double getValueNumber() const { return m_val_number; }
+    void rollback() { m_curIdx = m_prevIdx; }
 private:
     bool isAtEnd() const { return m_curIdx >= m_source.size(); }
     char advance() { return m_source[m_curIdx++]; }
@@ -45,7 +49,8 @@ private:
 
 private:
     std::string m_source;       // JSON source string
-    size_t m_curIdx;            // current index when scanning the JSON string
+    size_t m_curIdx;            // current index pos when scanning the JSON string
+    size_t m_prevIdx;           // previous index pos for rollback
     std::string m_val_string;   // store string value
     double m_val_number;        // store number value
 };
