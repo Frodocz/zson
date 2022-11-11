@@ -31,6 +31,27 @@ void Scanner::scanString() {
     size_t pos = m_curIdx;
     while (peek() != '\"' && !isAtEnd()) {
         advance();
+        if (peek() == '\\') {
+            advance();
+            switch (peek()) {
+                case 'b':
+                case 't':
+                case 'n':
+                case 'f':
+                case 'r':
+                case '\"':
+                case '\\':
+                    advance();
+                    break;
+                case 'u':
+                    for (int i = 0; i < 4; ++i) {
+                        advance();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     if (isAtEnd()) {
@@ -78,10 +99,13 @@ Scanner::JsonTokenType Scanner::scan() {
         case ',':
             return JsonTokenType::VALUE_SEPARATOR;
         case 't':
+            scanTrue();
             return JsonTokenType::LITERAL_TRUE;
         case 'f':
+            scanFalse();
             return JsonTokenType::LITERAL_FALSE;
         case 'n':
+            scanNull();
             return JsonTokenType::LITERAL_NULL;
         case ' ':
         case '\n':
@@ -97,7 +121,7 @@ Scanner::JsonTokenType Scanner::scan() {
                 return JsonTokenType::VALUE_NUMBER;
             }
     }
-    return JsonTokenType::VALUE_ERROR;
+    throw std::logic_error("Unexpected Token: " + c);
 }
 
 } // namespace zson

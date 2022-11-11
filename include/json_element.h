@@ -34,6 +34,30 @@ public:
     };
 
     JsonElement(): m_type(Type::JSON_NULL) {}
+    JsonElement(Type type) : m_type(type) {
+        switch (type) {
+            case Type::JSON_OBJECT:
+                m_value.val_object = new JsonObject();
+                break;
+            case Type::JSON_ARRAY:
+                m_value.val_array = new JsonArray();
+                break;
+            case Type::JSON_STRING:
+                m_value.val_string = new std::string;
+                break;
+            case Type::JSON_NUMBER:
+                m_value.val_number = 0;
+                break;
+            case Type::JSON_BOOL:
+                m_value.val_bool = false;
+                break;
+            case Type::JSON_NULL:
+                break;
+            default:
+                break;
+        }
+    }
+
     JsonElement(JsonObject* val) { value(val); }
     JsonElement(JsonArray* val) { value(val); }
     JsonElement(std::string* val) { value(val); }
@@ -57,6 +81,8 @@ public:
             delete m_value.val_string;
         }
     }
+
+    Type type() { return m_type; }
 
     void value(JsonObject* val) {
         m_type = Type::JSON_OBJECT;

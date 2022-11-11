@@ -23,7 +23,7 @@ JsonObject* Parser::parseObject() {
         std::string key = m_scanner.getValueString();
         next = m_scanner.scan();
         if (next != JsonTokenType::NAME_SEPARATOR) {
-            throw std::logic_error("Expected ':' as separator");
+            throw std::logic_error("Expected ':' as separator in object");
         }
         (*res)[key] = parse();
         next = m_scanner.scan();
@@ -31,7 +31,7 @@ JsonObject* Parser::parseObject() {
             break;
         }
         if (next != JsonTokenType::VALUE_SEPARATOR) {
-            throw std::logic_error("Expected ',' as separator");
+            throw std::logic_error("Expected ',' as separator in object");
         }
     }
     return res;
@@ -53,7 +53,7 @@ JsonArray* Parser::parseArray() {
         }
 
         if (next != JsonTokenType::VALUE_SEPARATOR) {
-            throw std::logic_error("Expected ',' as separator");
+            throw std::logic_error("Expected ',' as separator in array");
         }
     }
     return res;
@@ -62,41 +62,38 @@ JsonArray* Parser::parseArray() {
 JsonElement* Parser::parse() {
     JsonElement* element = new JsonElement();
     JsonTokenType type = m_scanner.scan();
-
-    switch (type) {
-        case JsonTokenType::END_OF_SOURCE: {
-            break;
-        }
-        case JsonTokenType::BEGIN_OBJECT: {
-            JsonObject* obj = parseObject();
-            element->value(obj);
-            break;
-        }
-        case JsonTokenType::BEGIN_ARRAY: {
-            JsonArray* arr = parseArray();
-            element->value(arr);
-            break;
-        }
-        case JsonTokenType::VALUE_STRING: {
-            std::string* str = new std::string(m_scanner.getValueString());
-            element->value(str);
-            break;
-        }
-        case JsonTokenType::VALUE_NUMBER: {
-            double val = m_scanner.getValueNumber();
-            element->value(val);
-            break;
-        }
-        case JsonTokenType::LITERAL_TRUE: {
-            element->value(true);
-            break;
-        }
-        case JsonTokenType::LITERAL_FALSE: {
-            element->value(false);
-            break;
-        }
-        case JsonTokenType::LITERAL_NULL: {
-            break;
+    if (type != JsonTokenType::END_OF_SOURCE) {
+        switch (type) {
+            case JsonTokenType::BEGIN_OBJECT: {
+                JsonObject* obj = parseObject();
+                element->value(obj);
+                break;
+            }
+            case JsonTokenType::BEGIN_ARRAY: {
+                JsonArray* arr = parseArray();
+                element->value(arr);
+                break;
+            }
+            case JsonTokenType::VALUE_STRING: {
+                std::string* str = new std::string(m_scanner.getValueString());
+                element->value(str);
+                break;
+            }
+            case JsonTokenType::VALUE_NUMBER: {
+                element->value(m_scanner.getValueNumber());
+                break;
+            }
+            case JsonTokenType::LITERAL_TRUE: {
+                element->value(true);
+                break;
+            }
+            case JsonTokenType::LITERAL_FALSE: {
+                element->value(false);
+                break;
+            }
+            case JsonTokenType::LITERAL_NULL: {
+                break;
+            }
         }
     }
     return element;

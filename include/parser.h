@@ -9,12 +9,12 @@ namespace zson {
 class Parser {
 public:
     Parser(Scanner scanner): m_scanner(scanner) {}
-    JsonElement* parse();
+    JsonElement* parse();       // Parse scanner to JsonElement
 private:
     JsonObject* parseObject();
     JsonArray* parseArray();
 private:
-    Scanner m_scanner;
+    Scanner m_scanner;          // Used to scan input file or string
 };
 
 } // namespace zson
